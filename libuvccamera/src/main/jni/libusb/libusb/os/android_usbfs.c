@@ -2923,6 +2923,9 @@ static int handle_iso_completion(struct libusb_device_handle *handle,	// XXX add
 		if (tpriv->iso_urbs == NULL) {
 			return LIBUSB_TRANSFER_ERROR;
 		}
+        if (tpriv->iso_urbs == 0) {
+            break;
+        }
 		if (urb == tpriv->iso_urbs[i]) {
 			urb_idx = i + 1;
 			break;
