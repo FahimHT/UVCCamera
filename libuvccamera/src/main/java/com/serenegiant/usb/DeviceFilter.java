@@ -21,7 +21,7 @@
  *  may have a different license, see the respective files.
  */
 
-package com.serenegiant.usb_libuvccamera;
+package com.serenegiant.usb;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -38,7 +38,7 @@ import android.hardware.usb.UsbInterface;
 import android.text.TextUtils;
 import android.util.Log;
 
-public final class LibUVCCameraDeviceFilter {
+public final class DeviceFilter {
 
 	private static final String TAG = "DeviceFilter";
 
@@ -61,13 +61,13 @@ public final class LibUVCCameraDeviceFilter {
 	// set true if specific device(s) should exclude
 	public final boolean isExclude;
 
-	public LibUVCCameraDeviceFilter(final int vid, final int pid, final int clasz, final int subclass,
-									final int protocol, final String manufacturer, final String product, final String serialNum) {
+	public DeviceFilter(final int vid, final int pid, final int clasz, final int subclass,
+						final int protocol, final String manufacturer, final String product, final String serialNum) {
 		this(vid, pid, clasz, subclass, protocol, manufacturer, product, serialNum, false);
 	}
 
-	public LibUVCCameraDeviceFilter(final int vid, final int pid, final int clasz, final int subclass,
-									final int protocol, final String manufacturer, final String product, final String serialNum, final boolean isExclude) {
+	public DeviceFilter(final int vid, final int pid, final int clasz, final int subclass,
+						final int protocol, final String manufacturer, final String product, final String serialNum, final boolean isExclude) {
 		mVendorId = vid;
 		mProductId = pid;
 		mClass = clasz;
@@ -81,11 +81,11 @@ public final class LibUVCCameraDeviceFilter {
 			mVendorId, mProductId, mClass, mSubclass, mProtocol)); */
 	}
 
-	public LibUVCCameraDeviceFilter(final UsbDevice device) {
+	public DeviceFilter(final UsbDevice device) {
 		this(device, false);
 	}
 
-	public LibUVCCameraDeviceFilter(final UsbDevice device, final boolean isExclude) {
+	public DeviceFilter(final UsbDevice device, final boolean isExclude) {
 		mVendorId = device.getVendorId();
 		mProductId = device.getProductId();
 		mClass = device.getDeviceClass();
@@ -105,14 +105,14 @@ public final class LibUVCCameraDeviceFilter {
 	 * @param deviceFilterXmlId
 	 * @return
 	 */
-	public static List<LibUVCCameraDeviceFilter> getDeviceFilters(final Context context, final int deviceFilterXmlId) {
+	public static List<DeviceFilter> getDeviceFilters(final Context context, final int deviceFilterXmlId) {
 		final XmlPullParser parser = context.getResources().getXml(deviceFilterXmlId);
-		final List<LibUVCCameraDeviceFilter> deviceFilters = new ArrayList<LibUVCCameraDeviceFilter>();
+		final List<DeviceFilter> deviceFilters = new ArrayList<DeviceFilter>();
 		try {
 			int eventType = parser.getEventType();
 			while (eventType != XmlPullParser.END_DOCUMENT) {
 	            if (eventType == XmlPullParser.START_TAG) {
-					final LibUVCCameraDeviceFilter deviceFilter = readEntryOne(context, parser);
+					final DeviceFilter deviceFilter = readEntryOne(context, parser);
 					if (deviceFilter != null) {
 						deviceFilters.add(deviceFilter);
 					}
@@ -244,7 +244,7 @@ public final class LibUVCCameraDeviceFilter {
 		return result;
 	}
 
-	public static LibUVCCameraDeviceFilter readEntryOne(final Context context, final XmlPullParser parser)
+	public static DeviceFilter readEntryOne(final Context context, final XmlPullParser parser)
 			throws XmlPullParserException, IOException {
 		int vendorId = -1;
 		int productId = -1;
@@ -288,7 +288,7 @@ public final class LibUVCCameraDeviceFilter {
 					exclude = getAttributeBoolean(context, parser, null, "exclude", false);
         		} else if (eventType == XmlPullParser.END_TAG) {
         			if (hasValue) {
-	        			return new LibUVCCameraDeviceFilter(vendorId, productId, deviceClass,
+	        			return new DeviceFilter(vendorId, productId, deviceClass,
 	        					deviceSubclass, deviceProtocol, manufacturerName, productName,
 	        					serialNumber, exclude);
         			}
@@ -404,7 +404,7 @@ public final class LibUVCCameraDeviceFilter {
 	 * @param f
 	 * @return
 	 */
-	public boolean matches(final LibUVCCameraDeviceFilter f) {
+	public boolean matches(final DeviceFilter f) {
 		if (isExclude != f.isExclude) {
 			return false;
 		}
@@ -447,8 +447,8 @@ public final class LibUVCCameraDeviceFilter {
 				|| mSubclass == -1 || mProtocol == -1) {
 			return false;
 		}
-		if (obj instanceof LibUVCCameraDeviceFilter) {
-			final LibUVCCameraDeviceFilter filter = (LibUVCCameraDeviceFilter) obj;
+		if (obj instanceof DeviceFilter) {
+			final DeviceFilter filter = (DeviceFilter) obj;
 
 			if (filter.mVendorId != mVendorId
 					|| filter.mProductId != mProductId

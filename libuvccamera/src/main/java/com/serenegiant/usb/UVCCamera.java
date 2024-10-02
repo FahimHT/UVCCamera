@@ -21,7 +21,7 @@
  *  may have a different license, see the respective files.
  */
 
-package com.serenegiant.usb_libuvccamera;
+package com.serenegiant.usb;
 
 import android.graphics.SurfaceTexture;
 import android.hardware.usb.UsbDevice;
@@ -30,7 +30,7 @@ import android.util.Log;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 
-import com.serenegiant.usb_libuvccamera.LibUVCCameraUSBMonitor.UsbControlBlock;
+import com.serenegiant.usb.USBMonitor.UsbControlBlock;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -211,7 +211,9 @@ public class UVCCamera {
 		if (mNativePtr != 0 && TextUtils.isEmpty(mSupportedSize)) {
 			mSupportedSize = nativeGetSupportedSize(mNativePtr);
 		}
-		nativeSetPreviewSize(mNativePtr, DEFAULT_PREVIEW_WIDTH, DEFAULT_PREVIEW_HEIGHT, DEFAULT_CAMERA_ANGLE,
+//		nativeSetPreviewSize(mNativePtr, DEFAULT_PREVIEW_WIDTH, DEFAULT_PREVIEW_HEIGHT, DEFAULT_CAMERA_ANGLE,
+//				DEFAULT_PREVIEW_MIN_FPS, DEFAULT_PREVIEW_MAX_FPS, DEFAULT_PREVIEW_MODE, DEFAULT_BANDWIDTH);
+		nativeSetPreviewSize(mNativePtr, DEFAULT_PREVIEW_WIDTH, DEFAULT_PREVIEW_HEIGHT,
 				DEFAULT_PREVIEW_MIN_FPS, DEFAULT_PREVIEW_MAX_FPS, DEFAULT_PREVIEW_MODE, DEFAULT_BANDWIDTH);
 	}
 
@@ -347,7 +349,7 @@ public class UVCCamera {
 			throw new IllegalArgumentException("invalid cameraAngle");
 		}
 		if (mNativePtr != 0) {
-			final int result = nativeSetPreviewSize(mNativePtr, width, height, cameraAngle, min_fps, max_fps, frameFormat, bandwidthFactor);
+			final int result = nativeSetPreviewSize(mNativePtr, width, height, min_fps, max_fps, frameFormat, bandwidthFactor);
 			if (result != 0){
 				throw new IllegalArgumentException("Failed to set preview size");
 			}
@@ -1121,12 +1123,19 @@ public class UVCCamera {
 	private static final native int nativeSetStatusCallback(final long mNativePtr, final IStatusCallback callback);
 	private static final native int nativeSetButtonCallback(final long mNativePtr, final IButtonCallback callback);
 
-	private static final native int nativeSetPreviewSize(final long id_camera, final int width, final int height, final int cameraAngle, final int min_fps, final int max_fps, final int mode, final float bandwidth);
+	private static final native int nativeSetPreviewSize(final long id_camera, final int width, final int height, final int min_fps, final int max_fps, final int mode, final float bandwidth);
+
 	private static final native String nativeGetSupportedSize(final long id_camera);
 	private static final native int nativeStartPreview(final long id_camera);
 	private static final native int nativeStopPreview(final long id_camera);
 	private static final native int nativeSetPreviewDisplay(final long id_camera, final Surface surface);
 	private static final native int nativeSetFrameCallback(final long mNativePtr, final IFrameCallback callback, final int pixelFormat);
+
+	private static final native int nativeMy_Start_Capture(long var0);
+	private static final native int nativeMyFrameCapture(long var0, byte[] var2);
+	private static final native int nativeMyFrameConvert(long var0, byte[] var1, byte[] var2, byte[] var3, byte[] var4, int var5, int var6, int var7, int var8, int var9);
+	private static final native int nativeMyTransferParamSet(long var0, int var2);
+	private static final native int nativeMySetParams(long var0, int var2);
 
 //**********************************************************************
 	/**

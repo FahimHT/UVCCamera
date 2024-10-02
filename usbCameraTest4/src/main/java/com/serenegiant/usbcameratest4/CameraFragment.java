@@ -49,11 +49,11 @@ import com.serenegiant.serviceclient.CameraClient;
 import com.serenegiant.serviceclient.ICameraClient;
 import com.serenegiant.serviceclient.ICameraClientCallback;
 
-import com.serenegiant.usb_libuvccamera.CameraDialog;
-import com.serenegiant.usb_libuvccamera.LibUVCCameraDeviceFilter;
-import com.serenegiant.usb_libuvccamera.LibUVCCameraUSBMonitor;
-import com.serenegiant.usb_libuvccamera.LibUVCCameraUSBMonitor.OnDeviceConnectListener;
-import com.serenegiant.usb_libuvccamera.LibUVCCameraUSBMonitor.UsbControlBlock;
+import com.serenegiant.usb.CameraDialog;
+import com.serenegiant.usb.DeviceFilter;
+import com.serenegiant.usb.USBMonitor;
+import com.serenegiant.usb.USBMonitor.OnDeviceConnectListener;
+import com.serenegiant.usb.USBMonitor.UsbControlBlock;
 import com.serenegiant.widget.CameraViewInterface;
 
 public class CameraFragment extends BaseFragment {
@@ -64,7 +64,7 @@ public class CameraFragment extends BaseFragment {
 	private static final int DEFAULT_WIDTH = 640;
 	private static final int DEFAULT_HEIGHT = 480;
 
-	private LibUVCCameraUSBMonitor mUSBMonitor;
+	private USBMonitor mUSBMonitor;
 	private ICameraClient mCameraClient;
 
 	private ToggleButton mPreviewButton;
@@ -91,8 +91,8 @@ public class CameraFragment extends BaseFragment {
 		super.onCreate(savedInstanceState);
 		if (DEBUG) { Log.v(TAG, "onCreate:"); }
 		if (mUSBMonitor == null) {
-			mUSBMonitor = new LibUVCCameraUSBMonitor(getActivity().getApplicationContext(), mOnDeviceConnectListener);
-			final List<LibUVCCameraDeviceFilter> filters = LibUVCCameraDeviceFilter.getDeviceFilters(getActivity(), R.xml.device_filter);
+			mUSBMonitor = new USBMonitor(getActivity().getApplicationContext(), mOnDeviceConnectListener);
+			final List<DeviceFilter> filters = DeviceFilter.getDeviceFilters(getActivity(), R.xml.device_filter);
 			mUSBMonitor.setDeviceFilter(filters);
 		}
 	}
@@ -162,7 +162,7 @@ public class CameraFragment extends BaseFragment {
 		super.onDetach();
 	}
 
-	public LibUVCCameraUSBMonitor getUSBMonitor() {
+	public USBMonitor getUSBMonitor() {
 		return mUSBMonitor;
 	}
 

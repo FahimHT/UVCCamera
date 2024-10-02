@@ -62,7 +62,9 @@ public class MediaMuxerWrapper {
 	public MediaMuxerWrapper(String dir, @Nullable String filename, @Nullable String ext) throws IOException {
 		if (TextUtils.isEmpty(ext)) ext = ".mp4";
 		try {
-			mOutputPath = getCaptureFile(Environment.DIRECTORY_MOVIES, ext, dir, filename).toString();
+//			mOutputPath = getCaptureFile(Environment.DIRECTORY_MOVIES, ext, dir, filename).toString();
+			File file = new File(dir, filename + ext);
+			mOutputPath = file.getPath();
 		} catch (final NullPointerException e) {
 			throw new RuntimeException("This app has no permission of writing external storage");
 		}

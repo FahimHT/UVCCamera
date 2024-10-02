@@ -41,11 +41,11 @@ import android.widget.ToggleButton;
 import com.serenegiant.common.BaseActivity;
 import com.serenegiant.encoder.MediaMuxerWrapper;
 
-import com.serenegiant.usb_libuvccamera.CameraDialog;
-import com.serenegiant.usb_libuvccamera.LibUVCCameraUSBMonitor;
-import com.serenegiant.usb_libuvccamera.LibUVCCameraUSBMonitor.OnDeviceConnectListener;
-import com.serenegiant.usb_libuvccamera.LibUVCCameraUSBMonitor.UsbControlBlock;
-import com.serenegiant.usb_libuvccamera.UVCCamera;
+import com.serenegiant.usb.CameraDialog;
+import com.serenegiant.usb.USBMonitor;
+import com.serenegiant.usb.USBMonitor.OnDeviceConnectListener;
+import com.serenegiant.usb.USBMonitor.UsbControlBlock;
+import com.serenegiant.usb.UVCCamera;
 import com.serenegiant.usbcameracommon.UVCCameraHandlerMultiSurface;
 import com.serenegiant.widget.CameraViewInterface;
 
@@ -57,7 +57,7 @@ public final class MainActivity extends BaseActivity implements CameraDialog.Cam
 	/**
 	 * for accessing USB
 	 */
-	private LibUVCCameraUSBMonitor mUSBMonitor;
+	private USBMonitor mUSBMonitor;
 	/**
 	 * Handler to execute camera releated methods sequentially on private thread
 	 */
@@ -96,7 +96,7 @@ public final class MainActivity extends BaseActivity implements CameraDialog.Cam
 		((View)mUVCCameraViewL).setOnLongClickListener(mOnLongClickListener);
 
 		synchronized (mSync) {
-			mUSBMonitor = new LibUVCCameraUSBMonitor(this, mOnDeviceConnectListener);
+			mUSBMonitor = new USBMonitor(this, mOnDeviceConnectListener);
 			mCameraHandler = UVCCameraHandlerMultiSurface.createHandler(this, mUVCCameraViewL, 1,
 				UVCCamera.DEFAULT_PREVIEW_WIDTH, UVCCamera.DEFAULT_PREVIEW_HEIGHT);
 		}
@@ -311,7 +311,7 @@ public final class MainActivity extends BaseActivity implements CameraDialog.Cam
 	 * @return
 	 */
 	@Override
-	public LibUVCCameraUSBMonitor getUSBMonitor() {
+	public USBMonitor getUSBMonitor() {
 		synchronized (mSync) {
 			return mUSBMonitor;
 		}

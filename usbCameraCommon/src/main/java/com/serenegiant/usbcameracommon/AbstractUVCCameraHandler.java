@@ -24,14 +24,11 @@
 package com.serenegiant.usbcameracommon;
 
 import android.app.Activity;
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.SurfaceTexture;
 import android.hardware.usb.UsbDevice;
-import android.media.AudioManager;
 import android.media.MediaActionSound;
 import android.media.MediaScannerConnection;
-import android.media.SoundPool;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
@@ -49,10 +46,10 @@ import com.serenegiant.encoder.MediaMuxerWrapper;
 import com.serenegiant.encoder.MediaSurfaceEncoder;
 import com.serenegiant.encoder.MediaVideoBufferEncoder;
 import com.serenegiant.encoder.MediaVideoEncoder;
-import com.serenegiant.usb_libuvccamera.IFrameCallback;
-import com.serenegiant.usb_libuvccamera.Size;
-import com.serenegiant.usb_libuvccamera.LibUVCCameraUSBMonitor;
-import com.serenegiant.usb_libuvccamera.UVCCamera;
+import com.serenegiant.usb.IFrameCallback;
+import com.serenegiant.usb.Size;
+import com.serenegiant.usb.USBMonitor;
+import com.serenegiant.usb.UVCCamera;
 import com.serenegiant.widget.CameraViewInterface;
 
 import java.io.BufferedOutputStream;
@@ -61,7 +58,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
@@ -147,7 +143,7 @@ abstract class AbstractUVCCameraHandler extends Handler {
 		}
 	}
 
-	public void open(final LibUVCCameraUSBMonitor.UsbControlBlock ctrlBlock) {
+	public void open(final USBMonitor.UsbControlBlock ctrlBlock) {
 		checkReleased();
 		sendMessage(obtainMessage(MSG_OPEN, ctrlBlock));
 	}
@@ -319,7 +315,7 @@ abstract class AbstractUVCCameraHandler extends Handler {
 		if (thread == null) return;
 		switch (msg.what) {
 		case MSG_OPEN:
-			thread.handleOpen((LibUVCCameraUSBMonitor.UsbControlBlock)msg.obj);
+			thread.handleOpen((USBMonitor.UsbControlBlock)msg.obj);
 			break;
 		case MSG_CLOSE:
 			thread.handleClose();
@@ -455,7 +451,7 @@ abstract class AbstractUVCCameraHandler extends Handler {
 			return (mUVCCamera != null) && (mUVCCamera.getDevice() != null) && mUVCCamera.getDevice().equals(device);
 		}
 
-		public void handleOpen(final LibUVCCameraUSBMonitor.UsbControlBlock ctrlBlock) {
+		public void handleOpen(final USBMonitor.UsbControlBlock ctrlBlock) {
 			if (DEBUG) { Log.v(TAG_THREAD, "handleOpen:"); }
 			handleClose();
 			try {

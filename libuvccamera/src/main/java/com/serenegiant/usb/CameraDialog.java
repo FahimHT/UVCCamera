@@ -21,7 +21,7 @@
  *  may have a different license, see the respective files.
  */
 
-package com.serenegiant.usb_libuvccamera;
+package com.serenegiant.usb;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,7 +49,7 @@ public class CameraDialog extends DialogFragment {
 	private static final String TAG = CameraDialog.class.getSimpleName();
 
 	public interface CameraDialogParent {
-		public LibUVCCameraUSBMonitor getUSBMonitor();
+		public USBMonitor getUSBMonitor();
 		public void onDialogResult(boolean canceled);
 	}
 	
@@ -76,7 +76,7 @@ public class CameraDialog extends DialogFragment {
 		return dialog;
 	}
 
-	protected LibUVCCameraUSBMonitor mUSBMonitor;
+	protected USBMonitor mUSBMonitor;
 	private Spinner mSpinner;
 	private DeviceListAdapter mDeviceListAdapter;
 
@@ -188,7 +188,7 @@ public class CameraDialog extends DialogFragment {
 
 	public void updateDevices() {
 //		mUSBMonitor.dumpDevices();
-		final List<LibUVCCameraDeviceFilter> filter = LibUVCCameraDeviceFilter.getDeviceFilters(getActivity(), R.xml.device_filter);
+		final List<DeviceFilter> filter = DeviceFilter.getDeviceFilters(getActivity(), R.xml.device_filter);
 		mDeviceListAdapter = new DeviceListAdapter(getActivity(), mUSBMonitor.getDeviceList(filter.get(0)));
 		mSpinner.setAdapter(mDeviceListAdapter);
 	}

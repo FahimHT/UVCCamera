@@ -21,7 +21,7 @@
  *  may have a different license, see the respective files.
  */
 
-package com.serenegiant.usb_libuvccamera;
+package com.serenegiant.usb;
 
 import android.util.SparseArray;
 

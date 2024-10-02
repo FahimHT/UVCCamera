@@ -26,13 +26,10 @@ package com.serenegiant.service;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
-import java.lang.reflect.Field;
 
 import android.content.Context;
-import android.media.AudioManager;
 import android.media.MediaActionSound;
 import android.media.MediaScannerConnection;
-import android.media.SoundPool;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
@@ -49,10 +46,9 @@ import com.serenegiant.encoder.MediaMuxerWrapper;
 import com.serenegiant.encoder.MediaSurfaceEncoder;
 import com.serenegiant.glutils.RenderHolderCallback;
 import com.serenegiant.glutils.RendererHolder;
-import com.serenegiant.usb_libuvccamera.LibUVCCameraUSBMonitor.UsbControlBlock;
-import com.serenegiant.usb_libuvccamera.Size;
-import com.serenegiant.usb_libuvccamera.UVCCamera;
-import com.serenegiant.usbcameratest4.R;
+import com.serenegiant.usb.USBMonitor.UsbControlBlock;
+import com.serenegiant.usb.Size;
+import com.serenegiant.usb.UVCCamera;
 
 public final class CameraServer extends Handler {
 	private static final boolean DEBUG = true;

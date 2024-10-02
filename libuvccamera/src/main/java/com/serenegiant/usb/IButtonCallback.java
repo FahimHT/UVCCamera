@@ -1,4 +1,4 @@
-package com.serenegiant.usb_libuvccamera;
+package com.serenegiant.usb;
 
 public interface IButtonCallback {
     void onButton(int button, int state);

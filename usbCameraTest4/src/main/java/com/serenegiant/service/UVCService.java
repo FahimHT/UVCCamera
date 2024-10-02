@@ -36,9 +36,9 @@ import android.util.SparseArray;
 import android.view.Surface;
 
 import com.serenegiant.common.BaseService;
-import com.serenegiant.usb_libuvccamera.LibUVCCameraUSBMonitor;
-import com.serenegiant.usb_libuvccamera.LibUVCCameraUSBMonitor.OnDeviceConnectListener;
-import com.serenegiant.usb_libuvccamera.LibUVCCameraUSBMonitor.UsbControlBlock;
+import com.serenegiant.usb.USBMonitor;
+import com.serenegiant.usb.USBMonitor.OnDeviceConnectListener;
+import com.serenegiant.usb.USBMonitor.UsbControlBlock;
 import com.serenegiant.usbcameratest4.MainActivity;
 import com.serenegiant.usbcameratest4.R;
 
@@ -48,7 +48,7 @@ public class UVCService extends BaseService {
 
 	private static final int NOTIFICATION = R.string.app_name;
 
-	private LibUVCCameraUSBMonitor mUSBMonitor;
+	private USBMonitor mUSBMonitor;
 	private NotificationManager mNotificationManager;
 
 	public UVCService() {
@@ -60,7 +60,7 @@ public class UVCService extends BaseService {
 		super.onCreate();
 		if (DEBUG) { Log.d(TAG, "onCreate:"); }
 		if (mUSBMonitor == null) {
-			mUSBMonitor = new LibUVCCameraUSBMonitor(getApplicationContext(), mOnDeviceConnectListener);
+			mUSBMonitor = new USBMonitor(getApplicationContext(), mOnDeviceConnectListener);
 			mUSBMonitor.register();
 		}
 		mNotificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);

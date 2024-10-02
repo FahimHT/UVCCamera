@@ -256,12 +256,12 @@ static jobject nativeGetSupportedSize(JNIEnv *env, jobject thiz,
 //======================================================================
 // 设定预览画面的大小
 static jint nativeSetPreviewSize(JNIEnv *env, jobject thiz,
-	ID_TYPE id_camera, jint width, jint height, jint cameraAngle, jint min_fps, jint max_fps, jint mode, jfloat bandwidth) {
+	ID_TYPE id_camera, jint width, jint height, jint min_fps, jint max_fps, jint mode, jfloat bandwidth) {
 
 	ENTER();
 	UVCCamera *camera = reinterpret_cast<UVCCamera *>(id_camera);
 	if (LIKELY(camera)) {
-		return camera->setPreviewSize(width, height, cameraAngle, min_fps, max_fps, mode, bandwidth);
+		return camera->setPreviewSize(width, height, min_fps, max_fps, mode, bandwidth);
 	}
 	RETURN(JNI_ERR, jint);
 }
@@ -2064,15 +2064,15 @@ static JNINativeMethod methods[] = {
 	{ "nativeConnect",					"(JIIIIILjava/lang/String;)I", (void *) nativeConnect },
 	{ "nativeRelease",					"(J)I", (void *) nativeRelease },
 
-	{ "nativeSetStatusCallback",		"(JLcom/serenegiant/usb_libuvccamera/IStatusCallback;)I", (void *) nativeSetStatusCallback },
-	{ "nativeSetButtonCallback",		"(JLcom/serenegiant/usb_libuvccamera/IButtonCallback;)I", (void *) nativeSetButtonCallback },
+	{ "nativeSetStatusCallback",		"(JLcom/serenegiant/usb/IStatusCallback;)I", (void *) nativeSetStatusCallback },
+	{ "nativeSetButtonCallback",		"(JLcom/serenegiant/usb/IButtonCallback;)I", (void *) nativeSetButtonCallback },
 
 	{ "nativeGetSupportedSize",			"(J)Ljava/lang/String;", (void *) nativeGetSupportedSize },
 	{ "nativeSetPreviewSize",			"(JIIIIIIF)I", (void *) nativeSetPreviewSize },
 	{ "nativeStartPreview",				"(J)I", (void *) nativeStartPreview },
 	{ "nativeStopPreview",				"(J)I", (void *) nativeStopPreview },
 	{ "nativeSetPreviewDisplay",		"(JLandroid/view/Surface;)I", (void *) nativeSetPreviewDisplay },
-	{ "nativeSetFrameCallback",			"(JLcom/serenegiant/usb_libuvccamera/IFrameCallback;I)I", (void *) nativeSetFrameCallback },
+	{ "nativeSetFrameCallback",			"(JLcom/serenegiant/usb/IFrameCallback;I)I", (void *) nativeSetFrameCallback },
 
 	{ "nativeSetCaptureDisplay",		"(JLandroid/view/Surface;)I", (void *) nativeSetCaptureDisplay },
 
@@ -2239,7 +2239,7 @@ static JNINativeMethod methods[] = {
 int register_uvccamera(JNIEnv *env) {
 	LOGV("register_uvccamera:");
 	if (registerNativeMethods(env,
-		"com/serenegiant/usb_libuvccamera/UVCCamera",
+		"com/serenegiant/usb/UVCCamera",
 		methods, NUM_ARRAY_ELEMENTS(methods)) < 0) {
 		return -1;
 	}

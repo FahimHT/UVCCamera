@@ -21,7 +21,7 @@
  *  may have a different license, see the respective files.
  */
 
-package com.serenegiant.usb_libuvccamera;
+package com.serenegiant.usb;
 
 import java.io.UnsupportedEncodingException;
 import java.lang.ref.WeakReference;
@@ -51,7 +51,7 @@ import android.util.SparseArray;
 
 import com.serenegiant.utils.HandlerThreadHandler;
 
-public final class LibUVCCameraUSBMonitor {
+public final class USBMonitor {
 
 	private static final boolean DEBUG = false;	// TODO set false on production
 	private static final String TAG = "USBMonitor";
@@ -71,7 +71,7 @@ public final class LibUVCCameraUSBMonitor {
 	private final UsbManager mUsbManager;
 	private final OnDeviceConnectListener mOnDeviceConnectListener;
 	private PendingIntent mPermissionIntent = null;
-	private List<LibUVCCameraDeviceFilter> mDeviceFilters = new ArrayList<LibUVCCameraDeviceFilter>();
+	private List<DeviceFilter> mDeviceFilters = new ArrayList<DeviceFilter>();
 
 	/**
 	 * 在工作线程上调用回调的处理程序
@@ -112,7 +112,7 @@ public final class LibUVCCameraUSBMonitor {
 		public void onCancel(UsbDevice device);
 	}
 
-	public LibUVCCameraUSBMonitor(final Context context, final OnDeviceConnectListener listener) {
+	public USBMonitor(final Context context, final OnDeviceConnectListener listener) {
 		if (DEBUG) Log.v(TAG, "USBMonitor:Constructor");
 		if (listener == null)
 			throw new IllegalArgumentException("OnDeviceConnectListener should not null.");
@@ -217,7 +217,7 @@ public final class LibUVCCameraUSBMonitor {
 	 * @param filter
 	 * @throws IllegalStateException
 	 */
-	public void setDeviceFilter(final LibUVCCameraDeviceFilter filter) throws IllegalStateException {
+	public void setDeviceFilter(final DeviceFilter filter) throws IllegalStateException {
 		if (destroyed) throw new IllegalStateException("already destroyed");
 		mDeviceFilters.clear();
 		mDeviceFilters.add(filter);
@@ -228,7 +228,7 @@ public final class LibUVCCameraUSBMonitor {
 	 * @param filter
 	 * @throws IllegalStateException
 	 */
-	public void addDeviceFilter(final LibUVCCameraDeviceFilter filter) throws IllegalStateException {
+	public void addDeviceFilter(final DeviceFilter filter) throws IllegalStateException {
 		if (destroyed) throw new IllegalStateException("already destroyed");
 		mDeviceFilters.add(filter);
 	}
@@ -238,7 +238,7 @@ public final class LibUVCCameraUSBMonitor {
 	 * @param filter
 	 * @throws IllegalStateException
 	 */
-	public void removeDeviceFilter(final LibUVCCameraDeviceFilter filter) throws IllegalStateException {
+	public void removeDeviceFilter(final DeviceFilter filter) throws IllegalStateException {
 		if (destroyed) throw new IllegalStateException("already destroyed");
 		mDeviceFilters.remove(filter);
 	}
@@ -248,7 +248,7 @@ public final class LibUVCCameraUSBMonitor {
 	 * @param filters
 	 * @throws IllegalStateException
 	 */
-	public void setDeviceFilter(final List<LibUVCCameraDeviceFilter> filters) throws IllegalStateException {
+	public void setDeviceFilter(final List<DeviceFilter> filters) throws IllegalStateException {
 		if (destroyed) throw new IllegalStateException("already destroyed");
 		mDeviceFilters.clear();
 		mDeviceFilters.addAll(filters);
@@ -259,7 +259,7 @@ public final class LibUVCCameraUSBMonitor {
 	 * @param filters
 	 * @throws IllegalStateException
 	 */
-	public void addDeviceFilter(final List<LibUVCCameraDeviceFilter> filters) throws IllegalStateException {
+	public void addDeviceFilter(final List<DeviceFilter> filters) throws IllegalStateException {
 		if (destroyed) throw new IllegalStateException("already destroyed");
 		mDeviceFilters.addAll(filters);
 	}
@@ -268,7 +268,7 @@ public final class LibUVCCameraUSBMonitor {
 	 * remove device filters
 	 * @param filters
 	 */
-	public void removeDeviceFilter(final List<LibUVCCameraDeviceFilter> filters) throws IllegalStateException {
+	public void removeDeviceFilter(final List<DeviceFilter> filters) throws IllegalStateException {
 		if (destroyed) throw new IllegalStateException("already destroyed");
 		mDeviceFilters.removeAll(filters);
 	}
@@ -299,7 +299,7 @@ public final class LibUVCCameraUSBMonitor {
 	 * @return
 	 * @throws IllegalStateException
 	 */
-	public List<UsbDevice> getDeviceList(final List<LibUVCCameraDeviceFilter> filters) throws IllegalStateException {
+	public List<UsbDevice> getDeviceList(final List<DeviceFilter> filters) throws IllegalStateException {
 		if (destroyed) throw new IllegalStateException("already destroyed");
 		final HashMap<String, UsbDevice> deviceList = mUsbManager.getDeviceList();
 		final List<UsbDevice> result = new ArrayList<UsbDevice>();
@@ -308,7 +308,7 @@ public final class LibUVCCameraUSBMonitor {
 				result.addAll(deviceList.values());
 			} else {
 				for (final UsbDevice device: deviceList.values() ) {
-					for (final LibUVCCameraDeviceFilter filter: filters) {
+					for (final DeviceFilter filter: filters) {
 						if ((filter != null) && filter.matches(device)) {
 							// when filter matches
 							if (!filter.isExclude) {
@@ -329,7 +329,7 @@ public final class LibUVCCameraUSBMonitor {
 	 * @return
 	 * @throws IllegalStateException
 	 */
-	public List<UsbDevice> getDeviceList(final LibUVCCameraDeviceFilter filter) throws IllegalStateException {
+	public List<UsbDevice> getDeviceList(final DeviceFilter filter) throws IllegalStateException {
 		if (destroyed) throw new IllegalStateException("already destroyed");
 		final HashMap<String, UsbDevice> deviceList = mUsbManager.getDeviceList();
 		final List<UsbDevice> result = new ArrayList<UsbDevice>();
@@ -459,7 +459,7 @@ public final class LibUVCCameraUSBMonitor {
 		if (hasPermission(device)) {
 			UsbControlBlock result = mCtrlBlocks.get(device);
 			if (result == null) {
-				result = new UsbControlBlock(LibUVCCameraUSBMonitor.this, device);    // この中でopenDeviceする
+				result = new UsbControlBlock(USBMonitor.this, device);    // この中でopenDeviceする
 				mCtrlBlocks.put(device, result);
 			}
 			return result;
@@ -479,7 +479,7 @@ public final class LibUVCCameraUSBMonitor {
 			final String action = intent.getAction();
 			if (ACTION_USB_PERMISSION.equals(action)) {
 				// when received the result of requesting USB permission
-				synchronized (LibUVCCameraUSBMonitor.this) {
+				synchronized (USBMonitor.this) {
 					final UsbDevice device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
 					if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) {
 						if (device != null) {
@@ -565,7 +565,7 @@ public final class LibUVCCameraUSBMonitor {
 				final boolean createNew;
 				ctrlBlock = mCtrlBlocks.get(device);
 				if (ctrlBlock == null) {
-					ctrlBlock = new UsbControlBlock(LibUVCCameraUSBMonitor.this, device);
+					ctrlBlock = new UsbControlBlock(USBMonitor.this, device);
 					mCtrlBlocks.put(device, ctrlBlock);
 					createNew = true;
 				} else {
@@ -947,7 +947,7 @@ public final class LibUVCCameraUSBMonitor {
 	 * never reuse the instance when it closed
 	 */
 	public static final class UsbControlBlock implements Cloneable {
-		private final WeakReference<LibUVCCameraUSBMonitor> mWeakMonitor;
+		private final WeakReference<USBMonitor> mWeakMonitor;
 		private final WeakReference<UsbDevice> mWeakDevice;
 		protected UsbDeviceConnection mConnection;
 		protected final UsbDeviceInfo mInfo;
@@ -960,9 +960,9 @@ public final class LibUVCCameraUSBMonitor {
 		 * @param monitor
 		 * @param device
 		 */
-		private UsbControlBlock(final LibUVCCameraUSBMonitor monitor, final UsbDevice device) {
+		private UsbControlBlock(final USBMonitor monitor, final UsbDevice device) {
 			if (DEBUG) Log.i(TAG, "UsbControlBlock:constructor");
-			mWeakMonitor = new WeakReference<LibUVCCameraUSBMonitor>(monitor);
+			mWeakMonitor = new WeakReference<USBMonitor>(monitor);
 			mWeakDevice = new WeakReference<UsbDevice>(device);
 			mConnection = monitor.mUsbManager.openDevice(device);
 			mInfo = updateDeviceInfo(monitor.mUsbManager, device, null);
@@ -993,7 +993,7 @@ public final class LibUVCCameraUSBMonitor {
 		 * @throws IllegalStateException
 		 */
 		private UsbControlBlock(final UsbControlBlock src) throws IllegalStateException {
-			final LibUVCCameraUSBMonitor monitor = src.getUSBMonitor();
+			final USBMonitor monitor = src.getUSBMonitor();
 			final UsbDevice device = src.getDevice();
 			if (device == null) {
 				throw new IllegalStateException("device may already be removed");
@@ -1003,7 +1003,7 @@ public final class LibUVCCameraUSBMonitor {
 				throw new IllegalStateException("device may already be removed or have no permission");
 			}
 			mInfo = updateDeviceInfo(monitor.mUsbManager, device, null);
-			mWeakMonitor = new WeakReference<LibUVCCameraUSBMonitor>(monitor);
+			mWeakMonitor = new WeakReference<USBMonitor>(monitor);
 			mWeakDevice = new WeakReference<UsbDevice>(device);
 			mBusNum = src.mBusNum;
 			mDevNum = src.mDevNum;
@@ -1028,7 +1028,7 @@ public final class LibUVCCameraUSBMonitor {
 			return ctrlblock;
 		}
 
-		public LibUVCCameraUSBMonitor getUSBMonitor() {
+		public USBMonitor getUSBMonitor() {
 			return mWeakMonitor.get();
 		}
 
@@ -1059,7 +1059,7 @@ public final class LibUVCCameraUSBMonitor {
 		 * @return same value if the devices has same vendor id, product id, device class, device subclass and device protocol
 		 */
 		public String getDeviceKeyName() {
-			return LibUVCCameraUSBMonitor.getDeviceKeyName(mWeakDevice.get());
+			return USBMonitor.getDeviceKeyName(mWeakDevice.get());
 		}
 
 		/**
@@ -1070,7 +1070,7 @@ public final class LibUVCCameraUSBMonitor {
 		 */
 		public String getDeviceKeyName(final boolean useNewAPI) throws IllegalStateException {
 			if (useNewAPI) checkConnection();
-			return LibUVCCameraUSBMonitor.getDeviceKeyName(mWeakDevice.get(), mInfo.serial, useNewAPI);
+			return USBMonitor.getDeviceKeyName(mWeakDevice.get(), mInfo.serial, useNewAPI);
 		}
 
 		/**
@@ -1080,7 +1080,7 @@ public final class LibUVCCameraUSBMonitor {
 		 */
 		public int getDeviceKey() throws IllegalStateException {
 			checkConnection();
-			return LibUVCCameraUSBMonitor.getDeviceKey(mWeakDevice.get());
+			return USBMonitor.getDeviceKey(mWeakDevice.get());
 		}
 
 		/**
@@ -1091,7 +1091,7 @@ public final class LibUVCCameraUSBMonitor {
 		 */
 		public int getDeviceKey(final boolean useNewAPI) throws IllegalStateException {
 			if (useNewAPI) checkConnection();
-			return LibUVCCameraUSBMonitor.getDeviceKey(mWeakDevice.get(), mInfo.serial, useNewAPI);
+			return USBMonitor.getDeviceKey(mWeakDevice.get(), mInfo.serial, useNewAPI);
 		}
 
 		/**
@@ -1100,7 +1100,7 @@ public final class LibUVCCameraUSBMonitor {
 		 * @return
 		 */
 		public String getDeviceKeyNameWithSerial() {
-			return LibUVCCameraUSBMonitor.getDeviceKeyName(mWeakDevice.get(), "", false);
+			return USBMonitor.getDeviceKeyName(mWeakDevice.get(), "", false);
 		}
 
 		/**
@@ -1301,7 +1301,7 @@ public final class LibUVCCameraUSBMonitor {
 				mInterfaces.clear();
 				mConnection.close();
 				mConnection = null;
-				final LibUVCCameraUSBMonitor monitor = mWeakMonitor.get();
+				final USBMonitor monitor = mWeakMonitor.get();
 				if (monitor != null) {
 					if (monitor.mOnDeviceConnectListener != null) {
 						monitor.mOnDeviceConnectListener.onDisconnect(mWeakDevice.get(), UsbControlBlock.this);
