@@ -77,3 +77,4 @@ libuvccamera/src/main/libs
 .DS_Store
 libuvccamera/.externalNativeBuild/*
 
+*.aar
