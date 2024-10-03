@@ -257,8 +257,12 @@ public final class MainActivity extends BaseActivity implements CameraDialog.Cam
 		@Override
 		public void onConnect(final UsbDevice device, final UsbControlBlock ctrlBlock, final boolean createNew) {
 			if (DEBUG) { Log.v(TAG, "onConnect:"); }
-			mCameraHandler.open(ctrlBlock);
-			startPreview();
+			if (ctrlBlock.getProductName() != null) {
+				mCameraHandler.open(ctrlBlock);
+				startPreview();
+			} else {
+				Log.w(TAG, "Unexpected error, device connection not open!");
+			}
 		}
 
 		@Override
