@@ -167,16 +167,21 @@ public final class USBMonitor {
 			if (DEBUG) Log.i(TAG, "register:");
 			final Context context = mWeakContext.get();
 			if (context != null) {
-				mPermissionIntent = PendingIntent.getBroadcast(
-						context,
-						0,
-						new Intent(ACTION_USB_PERMISSION),
-						(Build.VERSION.SDK_INT >= 31) ? PendingIntent.FLAG_MUTABLE : 0
-				);
+				int intentFlag = 0;
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+					intentFlag = PendingIntent.FLAG_MUTABLE | PendingIntent.FLAG_ALLOW_UNSAFE_IMPLICIT_INTENT;
+				} else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+					intentFlag = PendingIntent.FLAG_MUTABLE;
+				}
+				mPermissionIntent = PendingIntent.getBroadcast(context, 0, new Intent(ACTION_USB_PERMISSION), intentFlag);
 				final IntentFilter filter = new IntentFilter(ACTION_USB_PERMISSION);
 				// ACTION_USB_DEVICE_ATTACHED never comes on some devices so it should not be added here
 				filter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
-				context.registerReceiver(mUsbReceiver, filter);
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+					context.registerReceiver(mUsbReceiver, filter, Context.RECEIVER_NOT_EXPORTED);
+				} else {
+					context.registerReceiver(mUsbReceiver, filter);
+				}
 			}
 			// start connection check
 			mDeviceCounts = 0;
